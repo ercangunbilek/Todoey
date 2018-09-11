@@ -10,10 +10,18 @@ import UIKit
 
 class TodoViewController: UITableViewController {
 
-    let itemArray = ["Buy Milk" , "Buy Egg"]
+    
+    let defaults = UserDefaults.standard // Uygulamayi kapattigimizda veri kaybi yasanmamasi icin
+    var itemArray = ["Buy Milk" , "Buy Egg"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("ViewDidLoad")
+        if let userArray = defaults.array(forKey: "listArray") as? [String]{
+            //Uygulamayi kapattigimizda verileri .plist'ten cekiyoruz.Boylece verileri ekranda tekrar listeliyoruz
+            itemArray = userArray
+        }
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
 
@@ -54,5 +62,43 @@ class TodoViewController: UITableViewController {
         
         
     }
+    
+    
+    //MARK - Add New Item
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textfield = UITextField()
+        
+        let alert = UIAlertController(title: "Add New Item", message: "", preferredStyle: .alert)
+        
+        alert.addTextField { (alertTextField) in alertTextField.placeholder = "Add New Item"
+            alertTextField.placeholder = "Add item"
+            textfield = alertTextField
+        }
+        let action = UIAlertAction(title: "Add", style: .default) { (action) in
+            print(textfield.text!)
+            self.itemArray.append(textfield.text!)
+            self.defaults.set(self.itemArray, forKey: "listArray") //Uygulamayi kapattigimizda veri kaybi yasanmamasi icin
+            self.tableView.reloadData()
+            //print(self.itemArray[self.itemArray.count-1])
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
+        
+        
+    }
+    
+    
 }
+
+
+
+
+
+
+
+
 
