@@ -9,22 +9,17 @@
 import UIKit
 
 class TodoViewController: UITableViewController {
-
     
-    let defaults = UserDefaults.standard // Uygulamayi kapattigimizda veri kaybi yasanmamasi icin
-    var itemArray = ["Buy Milk" , "Buy Egg"]
+    // -- File Manager
+    let dataFIlePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    var itemArray = [Item]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("ViewDidLoad")
-        if let userArray = defaults.array(forKey: "listArray") as? [String]{
-            //Uygulamayi kapattigimizda verileri .plist'ten cekiyoruz.Boylece verileri ekranda tekrar listeliyoruz
-            itemArray = userArray
-        }
-        
-        // Do any additional setup after loading the view, typically from a nib.
+        loadItem()
     }
-
+    
     
     //MARK - TableView DataSource method
     
@@ -38,26 +33,32 @@ class TodoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoItemCell", for: indexPath)
-        
-        cell.textLabel?.text = itemArray[indexPath.row]
-        
+        cell.textLabel?.text = itemArray[indexPath.row].title
+        cell.accessoryType = itemArray[indexPath.row].done == true ? .checkmark : .none
         return cell
-        
     }
     
+    
+    
     //MARK - TableView Delagete Methods
-
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(itemArray[indexPath.row])
+        print(itemArray[indexPath.row].title)
         //deselectRow methodu secim islemi yapildiktan belirli sure sonra arka plani eski haline getiriyor
         tableView.deselectRow(at: indexPath, animated: true)
         
         //Secili hucreye onay tiki koyuyoruz
+        
+        
         if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark  {
             
             tableView.cellForRow(at: indexPath)?.accessoryType = .none
+            itemArray[indexPath.row].done = false
+            self.saveItem()
         }else{
             tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            itemArray[indexPath.row].done = true
+            self.saveItem()
         }
         
         
@@ -77,11 +78,12 @@ class TodoViewController: UITableViewController {
             textfield = alertTextField
         }
         let action = UIAlertAction(title: "Add", style: .default) { (action) in
-            print(textfield.text!)
-            self.itemArray.append(textfield.text!)
-            self.defaults.set(self.itemArray, forKey: "listArray") //Uygulamayi kapattigimizda veri kaybi yasanmamasi icin
-            self.tableView.reloadData()
-            //print(self.itemArray[self.itemArray.count-1])
+            
+            let newItem = Item(title: textfield.text!, done: false)
+            self.itemArray.append(newItem)
+            
+            self.saveItem()
+            
         }
         
         alert.addAction(action)
@@ -89,6 +91,40 @@ class TodoViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
         
         
+    }
+    
+    func saveItem(){
+        let encoder = PropertyListEncoder()
+        
+        do{
+            
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFIlePath!)
+            
+        }catch{
+            print("Encoding Item Error \(error)")
+        }
+        
+        
+        tableView.reloadData()
+        
+    }
+    
+    func loadItem(){
+        if let data = try? Data(contentsOf: dataFIlePath!){
+            
+            let decoder = PropertyListDecoder()
+            
+            do{
+                
+                itemArray = try decoder.decode([Item].self, from: data)
+                
+            }catch{
+                print("Error decode time")
+            }
+            
+            
+        }
     }
     
     
