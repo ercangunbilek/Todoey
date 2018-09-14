@@ -7,16 +7,17 @@
 //
 
 import UIKit
-
+import CoreData
 class TodoViewController: UITableViewController {
     
     // -- File Manager
     let dataFIlePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     var itemArray = [Item]()
-    
+    let context = (UIApplication.shared.delegate as! AppDelegate) .persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print(dataFIlePath!)
         loadItem()
     }
     
@@ -43,23 +44,15 @@ class TodoViewController: UITableViewController {
     //MARK - TableView Delagete Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(itemArray[indexPath.row].title)
+        print(itemArray[indexPath.row].title!)
         //deselectRow methodu secim islemi yapildiktan belirli sure sonra arka plani eski haline getiriyor
         tableView.deselectRow(at: indexPath, animated: true)
         
         //Secili hucreye onay tiki koyuyoruz
         
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark  {
-            
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-            itemArray[indexPath.row].done = false
-            self.saveItem()
-        }else{
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-            itemArray[indexPath.row].done = true
-            self.saveItem()
-        }
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        self.saveItem()
         
         
     }
@@ -79,7 +72,11 @@ class TodoViewController: UITableViewController {
         }
         let action = UIAlertAction(title: "Add", style: .default) { (action) in
             
-            let newItem = Item(title: textfield.text!, done: false)
+            
+            
+            let newItem = Item(context: self.context)
+            newItem.title = textfield.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             
             self.saveItem()
@@ -94,41 +91,69 @@ class TodoViewController: UITableViewController {
     }
     
     func saveItem(){
-        let encoder = PropertyListEncoder()
+        
         
         do{
             
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFIlePath!)
+            try context.save()
             
         }catch{
-            print("Encoding Item Error \(error)")
+            print("Error : \(error)")
         }
         
+        self.tableView.reloadData()
         
+    }
+    
+    func loadItem(with request : NSFetchRequest<Item> = Item.fetchRequest()){
+        
+        
+        do{
+            itemArray = try context.fetch(request)
+            
+        }catch{
+            print("Data load problem")
+        }
+        
+        tableView.reloadData()
+    }
+}
+
+//MARK: Search bar methods
+extension TodoViewController : UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@",searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadItem(with: request)
         tableView.reloadData()
         
     }
     
-    func loadItem(){
-        if let data = try? Data(contentsOf: dataFIlePath!){
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
             
-            let decoder = PropertyListDecoder()
             
-            do{
-                
-                itemArray = try decoder.decode([Item].self, from: data)
-                
-            }catch{
-                print("Error decode time")
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
             }
             
-            
+            loadItem()
         }
     }
     
-    
 }
+
+
+
+
+
+
+
+
 
 
 
