@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		116F3B0E214BE78200BACB5C /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 116F3B0D214BE78200BACB5C /* CategoryViewController.swift */; };
 		117318B92147AC61007CE9BB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117318B82147AC61007CE9BB /* AppDelegate.swift */; };
 		117318BB2147AC61007CE9BB /* TodoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117318BA2147AC61007CE9BB /* TodoViewController.swift */; };
 		117318BE2147AC61007CE9BB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 117318BC2147AC61007CE9BB /* Main.storyboard */; };
@@ -16,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		116F3B0D214BE78200BACB5C /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
 		117318B52147AC61007CE9BB /* Todoey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Todoey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		117318B82147AC61007CE9BB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		117318BA2147AC61007CE9BB /* TodoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoViewController.swift; sourceTree = "<group>"; };
@@ -85,8 +87,9 @@
 		117318D02148183F007CE9BB /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				117318B82147AC61007CE9BB /* AppDelegate.swift */,
+				116F3B0D214BE78200BACB5C /* CategoryViewController.swift */,
 				117318BA2147AC61007CE9BB /* TodoViewController.swift */,
+				117318B82147AC61007CE9BB /* AppDelegate.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -162,6 +165,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				116F3B0E214BE78200BACB5C /* CategoryViewController.swift in Sources */,
 				117318BB2147AC61007CE9BB /* TodoViewController.swift in Sources */,
 				1183A0E7214A88EE008D2857 /* DataModel.xcdatamodeld in Sources */,
 				117318B92147AC61007CE9BB /* AppDelegate.swift in Sources */,
